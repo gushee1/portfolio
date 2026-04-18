@@ -4,7 +4,7 @@ import { Sidebar } from "./components/sidebar";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Portfolio",
+  title: "Will Gushée · Portfolio",
   description: "A minimal, project-forward portfolio shell."
 };
 

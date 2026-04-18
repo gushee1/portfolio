@@ -1,3 +1,5 @@
+import { NextBuildContext } from "next/dist/build/build-context";
+
 export type Project = {
   slug: string;
   title: string;
@@ -19,19 +21,33 @@ export type Project = {
 
 export const projects: Project[] = [
   {
+    slug: "just-nil",
+    title: "JustNIL",
+    year: "2026",
+    summary: 
+      "A platform intended to match student talent with small businesses looking to sponsor NIL partnerships.",
+    stack: ["next.js", "coding agents"],
+    links: {
+      site: "https://justnil.org"
+    },
+    image: {
+      src: "/images/JustNIL_logo.png",
+      alt: "The JustNIL logo"
+    }
+  },
+  {
     slug: "exploring-concussions",
     title: "Inside the Mind",
     year: "2024",
     summary: 
-      "An immersive simulation of the SCAT-6 concussion evaluation protocol, used to teach \
-            students how to evaluate athletes who may have suffered a concussion. Designed \
-            to run on Oculus 2 headsets. The video features some mocap clips that I 'acted' for!",
+      "An immersive VR simulation designed to teach students to administer the SCAT-6 concussion \
+            evaluation protocol. In addition to development, I did some voice and mocap acting for this project!",
     stack: ["Unreal Engine 5", "Cascadeur"],
     links: {
       video: "https://www.youtube.com/watch?v=I5n8PS4zB2M"
     },
     image: {
-      src: "https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1800&q=80",
+      src: "/images/exploring_concussions.gif",
       alt: "A video featuring the Exploring Concussions project"
     },
   },

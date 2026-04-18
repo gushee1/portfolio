@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 type IconProps = {
   className?: string;
@@ -71,12 +71,12 @@ function ToggleIcon({ className }: IconProps) {
 const profileLinks = [
   {
     label: "LinkedIn",
-    href: "https://www.linkedin.com/",
+    href: "https://www.linkedin.com/in/william-gushee/",
     icon: LinkedinIcon
   },
   {
     label: "Email",
-    href: "mailto:hello@example.com",
+    href: "mailto:wgushee@umich.edu",
     icon: MailIcon
   },
   {
@@ -87,42 +87,81 @@ const profileLinks = [
 ];
 
 export function Sidebar() {
+  const sidebarRef = useRef<HTMLElement>(null);
   const [isExpanded, setIsExpanded] = useState(false);
   const [displayName, setDisplayName] = useState("W.G.");
+  const [isTypingName, setIsTypingName] = useState(false);
+
+  useEffect(() => {
+    if (!isExpanded) {
+      return;
+    }
+
+    function handlePointerDown(event: PointerEvent) {
+      if (!sidebarRef.current?.contains(event.target as Node)) {
+        setIsExpanded(false);
+      }
+    }
+
+    document.addEventListener("pointerdown", handlePointerDown);
+
+    return () => document.removeEventListener("pointerdown", handlePointerDown);
+  }, [isExpanded]);
 
   useEffect(() => {
     if (!isExpanded) {
       setDisplayName("W.G.");
+      setIsTypingName(false);
       return;
     }
 
     const fullName = "Will Gushée";
-    setDisplayName("W");
+    const frames = ["W.G", "W.", "W", ...Array.from({ length: fullName.length - 1 }, (_, index) =>
+      fullName.slice(0, index + 2)
+    )];
 
-    let nextLength = 2;
-    const timer = window.setInterval(() => {
-      setDisplayName(fullName.slice(0, nextLength));
-      nextLength += 1;
+    let frameIndex = 0;
+    let timer: number | undefined;
+    const startDelay = window.setTimeout(() => {
+      setIsTypingName(true);
+      timer = window.setInterval(() => {
+        setDisplayName(frames[frameIndex]);
+        frameIndex += 1;
 
-      if (nextLength > fullName.length + 1) {
+        if (frameIndex >= frames.length && timer) {
+          window.clearInterval(timer);
+          setIsTypingName(false);
+        }
+      }, 210);
+    }, 600);
+
+    return () => {
+      window.clearTimeout(startDelay);
+
+      if (timer) {
         window.clearInterval(timer);
       }
-    }, 55);
 
-    return () => window.clearInterval(timer);
+      setIsTypingName(false);
+    };
   }, [isExpanded]);
 
   return (
     <aside
+      ref={sidebarRef}
       className={`fixed inset-y-0 left-0 z-20 flex flex-col border-r border-[var(--line)] bg-[var(--background)] transition-[width] duration-300 ${
         isExpanded ? "w-72" : "w-20"
       }`}
     >
-      <div className="flex h-full flex-col px-4 py-5">
+      <div
+        className={`flex h-full flex-col px-4 py-5 transition-[align-items] duration-300 ${
+          isExpanded ? "items-stretch" : "items-center"
+        }`}
+      >
         <button
           aria-expanded={isExpanded}
           aria-label={isExpanded ? "Collapse sidebar" : "Expand sidebar"}
-          className="mb-8 flex h-10 w-10 items-center justify-center rounded border border-[var(--line)] text-[var(--muted)] transition hover:text-[var(--foreground)]"
+          className="mb-8 flex h-10 w-10 shrink-0 items-center justify-center rounded border border-[var(--line)] text-[var(--muted)] transition hover:text-[var(--foreground)]"
           type="button"
           onClick={() => setIsExpanded((current) => !current)}
         >
@@ -130,8 +169,8 @@ export function Sidebar() {
         </button>
 
         <Link
-          className={`relative mb-3 block overflow-hidden bg-[var(--line)] no-underline transition-[width,height,border-radius] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
-            isExpanded ? "h-64 w-full" : "h-14 w-14"
+          className={`relative mb-3 block shrink-0 overflow-hidden bg-[var(--line)] no-underline transition-[width,height,border-radius] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+            isExpanded ? "h-[clamp(8rem,30vh,16rem)] w-full" : "h-14 w-14"
           }`}
           style={{ borderRadius: isExpanded ? "4px" : "28px" }}
           href="/"
@@ -156,20 +195,30 @@ export function Sidebar() {
           aria-live="polite"
         >
           {displayName}
+          <span
+            aria-hidden="true"
+            className={`ml-1 inline-block h-[1em] w-[2px] align-[-0.15em] bg-current ${
+              isTypingName ? "typing-caret opacity-100" : "opacity-0"
+            }`}
+          />
         </p>
 
         <div
           className={`overflow-hidden transition-[max-height,opacity,transform] duration-300 ${
-            isExpanded ? "max-h-80 translate-y-0 opacity-100" : "max-h-0 -translate-y-2 opacity-0"
+            isExpanded ? "max-h-[28rem] translate-y-0 opacity-100" : "max-h-0 -translate-y-2 opacity-0"
           }`}
         >
           <p className="mb-8 text-sm leading-6 text-[var(--muted)]">
-            Developer focused on clear interfaces, useful tools, and software that feels calm under
-            real use.
+            Hi! I'm a software engineer currently based in Washington, D.C. I have interests in 
+            video game development, but when I'm writing traditional software, I love working on
+            developer-facing tools. I'm always trying out a new idea, so feel free to get in touch!
           </p>
         </div>
 
-        <nav aria-label="Profile links" className="mt-auto flex flex-col gap-2">
+        <nav
+          aria-label="Profile links"
+          className={`flex flex-col gap-0.5 ${isExpanded ? "mt-10 w-full" : "mt-auto items-center"}`}
+        >
           {profileLinks.map((item) => {
             const Icon = item.icon;
             const content = (
@@ -179,7 +228,9 @@ export function Sidebar() {
               </>
             );
             const className =
-              "flex h-11 items-center gap-3 rounded px-2 text-sm text-[var(--muted)] no-underline transition hover:text-[var(--foreground)]";
+              `flex h-9 items-center rounded text-sm text-[var(--muted)] no-underline transition hover:text-[var(--foreground)] ${
+                isExpanded ? "w-full gap-3 px-2" : "w-10 justify-center px-0"
+              }`;
 
             if (item.href.startsWith("/")) {
               return (

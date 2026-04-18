@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server";
+import nodemailer from "nodemailer";
+
+export const runtime = "nodejs";
 
 type QuoteRequest = {
   quote?: string;
   author?: string;
-  email?: string;
 };
-
-const resendApiUrl = "https://api.resend.com/emails";
 
 function escapeHtml(value: string) {
   return value
@@ -17,58 +17,67 @@ function escapeHtml(value: string) {
     .replaceAll("'", "&#039;");
 }
 
-function isValidEmail(value: string) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+function isQuoteRequest(value: unknown): value is QuoteRequest {
+  return typeof value === "object" && value !== null;
 }
 
 export async function POST(request: Request) {
-  const resendApiKey = process.env.RESEND_API_KEY;
+  const gmailUser = process.env.GMAIL_USER;
+  const gmailAppPassword = process.env.GMAIL_APP_PASSWORD;
   const toEmail = process.env.QUOTE_RECIPIENT_EMAIL;
-  const fromEmail = process.env.RESEND_FROM_EMAIL ?? "Portfolio <onboarding@resend.dev>";
 
-  if (!resendApiKey || !toEmail) {
+  if (!gmailUser || !gmailAppPassword || !toEmail) {
     return NextResponse.json(
       { error: "Quote email is not configured yet." },
       { status: 500 }
     );
   }
 
-  const body = (await request.json()) as QuoteRequest;
+  let body: unknown;
+
+  try {
+    body = await request.json();
+  } catch {
+    return NextResponse.json({ error: "Please submit a valid quote request." }, { status: 400 });
+  }
+
+  if (!isQuoteRequest(body)) {
+    return NextResponse.json({ error: "Please submit a valid quote request." }, { status: 400 });
+  }
+
   const quote = body.quote?.trim() ?? "";
   const author = body.author?.trim() ?? "";
-  const email = body.email?.trim() ?? "";
 
-  if (!quote || !author || !email) {
-    return NextResponse.json({ error: "Quote, author, and email are required." }, { status: 400 });
+  if (!quote || !author) {
+    return NextResponse.json({ error: "Quote and author are required." }, { status: 400 });
   }
 
-  if (!isValidEmail(email)) {
-    return NextResponse.json({ error: "Please enter a valid email address." }, { status: 400 });
-  }
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: gmailUser,
+      pass: gmailAppPassword
+    }
+  });
 
-  const response = await fetch(resendApiUrl, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${resendApiKey}`,
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      from: fromEmail,
-      to: [toEmail],
-      replyTo: email,
+  try {
+    await transporter.sendMail({
+      from: `"Portfolio Quotes" <${gmailUser}>`,
+      to: toEmail,
       subject: "Portfolio quote submission",
-      text: `Quote:\n${quote}\n\nAuthor:\n${author}\n\nSubmitted by:\n${email}`,
+      text: `Quote:\n${quote}\n\nAuthor:\n${author}`,
       html: `
         <h1>Portfolio quote submission</h1>
         <p><strong>Quote:</strong><br>${escapeHtml(quote)}</p>
         <p><strong>Author:</strong><br>${escapeHtml(author)}</p>
-        <p><strong>Submitted by:</strong><br>${escapeHtml(email)}</p>
       `
-    })
-  });
-
-  if (!response.ok) {
-    return NextResponse.json({ error: "Could not send the quote right now." }, { status: 502 });
+    });
+  } catch (error) {
+    console.error("Gmail quote email failed", error);
+    return NextResponse.json(
+      { error: "Could not send the quote right now. Check your Gmail app password and account settings." },
+      { status: 502 }
+    );
   }
 
   return NextResponse.json({ ok: true });

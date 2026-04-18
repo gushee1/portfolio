@@ -20,10 +20,10 @@ export function FooterQuotes() {
     setStatus("sending");
     setMessage("");
 
-    const formData = new FormData(event.currentTarget);
+    const form = event.currentTarget;
+    const formData = new FormData(form);
     const quoteText = String(formData.get("quote") ?? "").trim();
     const author = String(formData.get("author") ?? "").trim();
-    const email = String(formData.get("email") ?? "").trim();
 
     const response = await fetch("/api/quote", {
       method: "POST",
@@ -32,8 +32,7 @@ export function FooterQuotes() {
       },
       body: JSON.stringify({
         quote: quoteText,
-        author,
-        email
+        author
       })
     });
 
@@ -44,7 +43,7 @@ export function FooterQuotes() {
       return;
     }
 
-    event.currentTarget.reset();
+    form.reset();
     setStatus("sent");
     setMessage("Sent. Thank you.");
   }
@@ -74,7 +73,7 @@ export function FooterQuotes() {
       </p>
 
       <div className="pointer-events-none absolute bottom-full left-0 z-30 w-[min(20rem,calc(100vw-7rem))] translate-y-2 border border-[var(--line)] bg-[var(--background)] p-4 opacity-0 shadow-sm transition duration-200 group-hover:pointer-events-auto group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:translate-y-0 group-focus-within:opacity-100">
-        <p className="mb-3 text-sm text-[var(--foreground)]">Submit your favorite quote!</p>
+        <p className="mb-3 text-sm text-[var(--foreground)]">Send me your favorite quote, and I might feature it!</p>
         <form className="space-y-3" onSubmit={handleSubmit}>
           <label className="block">
             <span className="mb-1 block text-xs uppercase">Quote</span>
@@ -93,18 +92,6 @@ export function FooterQuotes() {
               type="text"
             />
           </label>
-          <label className="block">
-            <span className="mb-1 block text-xs uppercase">Your email</span>
-            <input
-              className="w-full rounded border border-[var(--line)] bg-transparent px-3 py-2 text-sm text-[var(--foreground)] outline-none focus:border-[var(--foreground)]"
-              name="email"
-              required
-              type="email"
-            />
-          </label>
-          <p className="text-xs leading-5">
-            Your email is only used to send the quote. No email list to worry about!
-          </p>
           <button
             disabled={status === "sending"}
             className="rounded border border-[var(--foreground)] px-3 py-2 text-sm text-[var(--foreground)] transition hover:bg-[var(--foreground)] hover:text-[var(--background)]"

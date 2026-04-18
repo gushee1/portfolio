@@ -1,3 +1,9 @@
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Will Gushée · Resume"
+};
+
 export default function ResumePage() {
   return (
     <main className="py-10 sm:py-14">
