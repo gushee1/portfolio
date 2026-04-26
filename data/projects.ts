@@ -31,7 +31,7 @@ export const projects: Project[] = [
       site: "https://justnil.org"
     },
     image: {
-      src: "/images/JustNIL_logo.png",
+      src: "/images/JustNIL_logo_no_text.png",
       alt: "The JustNIL logo"
     }
   },
@@ -57,7 +57,7 @@ export const projects: Project[] = [
     year: "2024",
     summary:
       "A bespoke C++ game engine with support and integration for Lua scripting, 2D graphics with SDL, \
-										Box2D for realistic 2D physics, and ASIO for online multiplayer networking.",
+										and Box2D for realistic 2D physics",
     stack: ["C++", "Lua", "SDL", "Box2D"],
     links: {
       repo: "https://github.com/gushee1/grater",
