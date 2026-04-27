@@ -5,7 +5,10 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Will Gushée · Portfolio",
-  description: "A minimal, project-forward portfolio shell."
+  description: "A minimal, project-forward portfolio shell.",
+  icons: {
+    icon: "/images/site_logo.png"
+  }
 };
 
 export default function RootLayout({
