@@ -224,12 +224,12 @@ export function Sidebar() {
       className="sticky top-0 z-20 border-b border-[var(--line)] bg-[var(--background)]/95 backdrop-blur"
     >
       <div className="mx-auto max-w-6xl px-5 py-4 sm:px-8 lg:px-12">
-        <div className="flex flex-wrap items-center gap-4">
-          <div className="flex min-w-0 flex-1 items-stretch gap-4">
+        <div className="grid grid-cols-[minmax(0,1fr)_2.5rem] items-start gap-x-4 gap-y-3 sm:flex sm:flex-wrap sm:items-center sm:gap-4">
+          <div className="col-start-1 row-span-2 flex min-w-0 flex-1 flex-wrap items-center gap-x-4 gap-y-0 sm:order-none sm:flex-nowrap sm:items-stretch sm:gap-4">
             <div
               className={`relative shrink-0 overflow-hidden bg-[var(--line)] transition-[width,height,border-radius] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
                 isExpanded
-                  ? "h-40 w-40 rounded-[6px] sm:h-36 sm:w-48"
+                  ? "h-14 w-14 rounded-[28px] sm:h-36 sm:w-48 sm:rounded-[6px]"
                   : "h-14 w-14 self-center rounded-[28px] cursor-pointer"
               }`}
               aria-label="Expand menu"
@@ -251,14 +251,14 @@ export function Sidebar() {
                 src="/images/budapest_shot_web_head.jpg"
                 alt="Profile portrait"
                 fill
-                sizes={isExpanded ? "(min-width: 640px) 192px, 160px" : "56px"}
+                sizes={isExpanded ? "(min-width: 640px) 192px, 56px" : "56px"}
                 className="object-cover transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
                 priority
               />
             </div>
 
-            <div className="min-w-0 flex-1 self-center">
-              <p className="font-[family-name:var(--font-serif)] text-2xl leading-none sm:text-3xl">
+            <div className="contents sm:block sm:min-w-0 sm:flex-1 sm:self-center">
+              <p className="min-w-0 flex-1 self-center font-[family-name:var(--font-serif)] text-2xl leading-none sm:self-auto sm:text-3xl">
                 {displayTitle}
                 <span
                   aria-hidden="true"
@@ -269,8 +269,10 @@ export function Sidebar() {
               </p>
 
               <div
-                className={`overflow-hidden transition-[max-height,opacity,transform,margin] duration-300 ${
-                  isExpanded ? "mt-3 max-h-32 translate-y-0 opacity-100" : "mt-0 max-h-0 -translate-y-2 opacity-0"
+                className={`w-full overflow-hidden transition-[max-height,opacity,transform,margin] duration-300 sm:w-auto ${
+                  isExpanded
+                    ? "mt-3 max-h-96 translate-y-0 opacity-100 sm:max-h-32"
+                    : "mt-0 max-h-0 -translate-y-2 opacity-0"
                 }`}
               >
                 <p className="max-w-3xl text-sm leading-6 text-[var(--muted)] sm:text-base">
@@ -282,7 +284,12 @@ export function Sidebar() {
             </div>
           </div>
 
-          <nav aria-label="Profile links" className="ml-auto flex items-center gap-1 sm:gap-2">
+          <nav
+            aria-label="Profile links"
+            className={`col-start-2 row-start-2 ml-auto flex-col gap-2 self-start sm:order-none sm:ml-auto sm:basis-auto sm:flex-row sm:items-center sm:justify-start sm:gap-2 ${
+              isExpanded ? "flex" : "hidden sm:flex"
+            }`}
+          >
             {profileLinks.map((item) => {
               const Icon = item.icon;
               const content = (
@@ -313,7 +320,7 @@ export function Sidebar() {
           <button
             aria-expanded={isExpanded}
             aria-label={isExpanded ? "Collapse menu" : "Expand menu"}
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded border border-[var(--line)] text-[var(--muted)] transition hover:text-[var(--foreground)]"
+            className="col-start-2 row-start-1 mt-2 flex h-10 w-10 shrink-0 items-center justify-center rounded border border-[var(--line)] text-[var(--muted)] transition hover:text-[var(--foreground)] sm:order-none sm:mt-0"
             type="button"
             onClick={() => setIsExpanded((current) => !current)}
           >

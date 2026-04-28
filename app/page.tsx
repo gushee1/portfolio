@@ -9,7 +9,7 @@ export default function Home() {
           {projects.map((project) => (
             <article
               key={project.slug}
-              className="grid gap-5 py-8 sm:grid-cols-[8rem_1fr] sm:gap-8 lg:grid-cols-[14rem_1fr_17rem]"
+              className="grid justify-items-center gap-5 py-8 text-center sm:grid-cols-[8rem_1fr] sm:justify-items-start sm:gap-8 sm:text-left lg:grid-cols-[14rem_1fr_17rem]"
             >
               <div className="relative aspect-[4/3] w-full max-w-44 overflow-hidden bg-transparent lg:max-w-56">
                 <Image
@@ -31,7 +31,7 @@ export default function Home() {
                   {project.summary}
                 </p>
               </div>
-              <div className="flex flex-wrap content-start gap-x-5 gap-y-2 text-sm lg:justify-end">
+              <div className="flex flex-wrap justify-center gap-x-5 gap-y-2 text-sm sm:justify-start lg:justify-end">
                 {project.links.repo && (
                   <a className="underline hover:text-[var(--accent)]" href={project.links.repo}>
                     Repo
